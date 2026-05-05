@@ -49,6 +49,19 @@ function resolveMovePair(gs, wMove, bMove) {
     }
   }
 
+  // ---------------------------------------------------------------
+  // Pre-resolution validation: moving to a friendly-occupied square is only
+  // valid if the opponent is also moving to that square this turn (i.e. they
+  // capture the friendly piece before you land). If the opponent does NOT move
+  // there, the move-pair is invalid → resubmit.
+  // ---------------------------------------------------------------
+  if (atWDest && colorOf(atWDest) === 'white' && bMove.to !== wMove.to) {
+    return { newState: null, events: [], outcome: null, reason: 'friendly_occupied' };
+  }
+  if (atBDest && colorOf(atBDest) === 'black' && wMove.to !== bMove.to) {
+    return { newState: null, events: [], outcome: null, reason: 'friendly_occupied' };
+  }
+
   // --- Clear starting squares ---
   newGs.clearSq(wMove.from);
   newGs.clearSq(bMove.from);

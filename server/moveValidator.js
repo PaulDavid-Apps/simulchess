@@ -31,7 +31,6 @@ function isValidMove(gameState, from, to, color) {
   if (colorOf(piece) !== color) return false;
 
   const dest = gameState.getPiece(to);
-  if (dest && colorOf(dest) === color) return false; // can't capture own piece
 
   const type = pieceType(piece);
   const isWhiteColor = color === 'white';
