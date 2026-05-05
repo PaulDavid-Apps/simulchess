@@ -2,6 +2,24 @@
 
 const { colorOf, pieceType, pieceValue, rankOf, fileOf, squareAt } = require('./gameState');
 
+function slidingPathClear(gs, from, to) {
+  const df = fileOf(to) - fileOf(from);
+  const dr = rankOf(to) - rankOf(from);
+  const isDiag = Math.abs(df) === Math.abs(dr);
+  const isLine = df === 0 || dr === 0;
+  if (!isDiag && !isLine) return true; // non-sliding piece, skip
+  const sf = Math.sign(df);
+  const sr = Math.sign(dr);
+  let f = fileOf(from) + sf;
+  let r = rankOf(from) + sr;
+  while (f !== fileOf(to) || r !== rankOf(to)) {
+    if (gs.getPiece(squareAt(f, r))) return false;
+    f += sf;
+    r += sr;
+  }
+  return true;
+}
+
 /**
  * Resolve a SimulChess move pair.
  *
@@ -65,6 +83,20 @@ function resolveMovePair(gs, wMove, bMove) {
   // --- Clear starting squares ---
   newGs.clearSq(wMove.from);
   newGs.clearSq(bMove.from);
+
+  // ---------------------------------------------------------------
+  // Post-clear path validation for sliding pieces: enemy pieces in the path
+  // were allowed speculatively at submission; now verify they actually moved.
+  // After clearing both starting squares, the board reflects pieces-in-transit.
+  // ---------------------------------------------------------------
+  const wSliding = ['b', 'r', 'q'].includes(wType);
+  const bSliding = ['b', 'r', 'q'].includes(bType);
+  if (wSliding && !slidingPathClear(newGs, wMove.from, wMove.to)) {
+    return { newState: null, events: [], outcome: null, reason: 'path_blocked' };
+  }
+  if (bSliding && !slidingPathClear(newGs, bMove.from, bMove.to)) {
+    return { newState: null, events: [], outcome: null, reason: 'path_blocked' };
+  }
 
   // ---------------------------------------------------------------
   // CASE 1: Both pieces move to the same destination square

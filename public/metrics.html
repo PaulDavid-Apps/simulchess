@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimulChess — Metrics</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    #metrics-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      gap: 2rem;
+    }
+
+    .metrics-header {
+      text-align: center;
+    }
+    .metrics-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e94560, #533483);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .metrics-header p {
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+    .stat-card.highlight { border-color: var(--accent2); }
+
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      font-family: monospace;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 0.4rem;
+    }
+    .stat-pct {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .bar-section {
+      width: 100%;
+      max-width: 600px;
+    }
+    .bar-section h2 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .outcome-bar {
+      display: flex;
+      height: 28px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .bar-white { background: #f0d9b5; transition: width 0.5s ease; }
+    .bar-black { background: #b58863; transition: width 0.5s ease; }
+    .bar-draw  { background: var(--surface2); transition: width 0.5s ease; }
+
+    .bar-legend {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .active-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .active-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.4s infinite;
+    }
+
+    .nav-link {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    #error-msg {
+      color: var(--red);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="metrics-page">
+    <div class="metrics-header">
+      <h1>SimulChess Metrics</h1>
+      <p id="last-updated">Loading…</p>
+    </div>
+
+    <div id="active-wrap">
+      <div class="active-badge">
+        <span class="active-dot"></span>
+        <span id="active-count">—</span> active game(s)
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-value" id="val-total">—</div>
+        <div class="stat-label">Games Played</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="val-white">—</div>
+        <div class="stat-label">White Wins</div>
+        <div class="stat-pct" id="pct-white"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="val-black">—</div>
+        <div class="stat-label">Black Wins</div>
+        <div class="stat-pct" id="pct-black"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="val-draws">—</div>
+        <div class="stat-label">Draws</div>
+        <div class="stat-pct" id="pct-draws"></div>
+      </div>
+    </div>
+
+    <div class="bar-section">
+      <h2>Outcome Distribution</h2>
+      <div class="outcome-bar">
+        <div class="bar-white" id="bar-white" style="width:0%"></div>
+        <div class="bar-draw"  id="bar-draw"  style="width:0%"></div>
+        <div class="bar-black" id="bar-black" style="width:0%"></div>
+      </div>
+      <div class="bar-legend">
+        <span><span class="legend-dot" style="background:#f0d9b5"></span>White</span>
+        <span><span class="legend-dot" style="background:var(--surface2)"></span>Draw</span>
+        <span><span class="legend-dot" style="background:#b58863"></span>Black</span>
+      </div>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <a class="nav-link" href="/">&#8592; Back to SimulChess</a>
+  </div>
+
+  <script>
+    async function load() {
+      try {
+        const res = await fetch('/api/metrics');
+        if (!res.ok) throw new Error(res.statusText);
+        const d = await res.json();
+
+        const total = d.gamesPlayed;
+        document.getElementById('val-total').textContent  = total;
+        document.getElementById('val-white').textContent  = d.whiteWins;
+        document.getElementById('val-black').textContent  = d.blackWins;
+        document.getElementById('val-draws').textContent  = d.draws;
+        document.getElementById('active-count').textContent = d.activeGames;
+
+        const pct = n => total > 0 ? (n / total * 100).toFixed(1) + '%' : '—';
+        document.getElementById('pct-white').textContent = pct(d.whiteWins);
+        document.getElementById('pct-black').textContent = pct(d.blackWins);
+        document.getElementById('pct-draws').textContent = pct(d.draws);
+
+        document.getElementById('bar-white').style.width = total > 0 ? pct(d.whiteWins) : '0%';
+        document.getElementById('bar-draw').style.width  = total > 0 ? pct(d.draws)     : '0%';
+        document.getElementById('bar-black').style.width = total > 0 ? pct(d.blackWins) : '0%';
+
+        const now = new Date().toLocaleTimeString();
+        document.getElementById('last-updated').textContent = `Updated ${now} · refreshes every 30s`;
+        document.getElementById('error-msg').textContent = '';
+      } catch (e) {
+        document.getElementById('error-msg').textContent = 'Failed to load metrics.';
+      }
+    }
+
+    load();
+    setInterval(load, 30_000);
+  </script>
+</body>
+</html>
