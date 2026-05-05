@@ -1,0 +1,37 @@
+﻿Core Rules
+1. Simultaneous submission
+Each turn, both players secretly submit one move from the current board position.
+2. Simultaneous reveal and resolution
+Once both moves are submitted, they are revealed and resolved together as a single move-pair.
+3. Standard movement patterns
+Each submitted move must follow the normal movement pattern of the moving piece, based on the current board position.
+4. King exposure is allowed
+A move may expose its own king to capture.
+5. Ignoring attack is allowed
+A move may ignore an existing attack on its own king.
+6. Moving into attack is allowed
+A king may move onto a square attacked by an opposing piece.
+7. No check or checkmate
+There is no check, checkmate, stalemate-by-check, or forced response to an attack on the king.
+8. Normal capture of a stationary piece
+If a piece moves to capture an opposing piece, and that opposing piece does not move during the same move-pair, the opposing piece is captured.
+9. Capture attempt against a moving piece
+If a piece moves to capture an opposing piece, and that opposing piece also moves during the same move-pair, both moves happen and the opposing piece is not captured on its starting square.
+10. Both pieces move to the same square
+If both players’ pieces move to the same destination square, compare the normal material value of the pieces.
+11. Higher-value piece wins destination conflict
+The higher-value piece remains on the destination square. The lower-value piece is removed from the board.
+12. Equal-value pieces in destination conflict
+If both pieces have the same value, both pieces are removed from the board.
+13. Suggested piece values for conflicts
+Pawns are worth 1, knights and bishops 3, rooks 5, queens 9, and kings have special king-capture rules rather than a normal point value.
+14. King capture ends the game
+The game ends when a king is physically captured by a resolved move.
+15. Single king capture
+If exactly one king is captured during a move-pair, the player whose king was captured loses.
+16. Double king capture
+If both kings are captured during the same move-pair, the game is drawn.
+17. Unresolvable non-terminal conflicts
+If a move-pair creates an unresolvable conflict that does not involve king capture, both players must resubmit moves.
+18. Repeated failed submissions
+If players fail to produce a resolvable move-pair three times for the same turn, the game is drawn.

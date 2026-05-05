@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimulChess</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- chessboard-element web component -->
+  <script type="module" src="https://unpkg.com/chessboard-element@1.2.0/bundled/chessboard-element.bundled.js"></script>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       HOME SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="logo">
+      <h1>SimulChess</h1>
+      <p>Both players move at the same time.</p>
+    </div>
+    <div class="home-buttons">
+      <button class="btn btn-primary btn-lg" id="btn-play">
+        &#9654; Play
+      </button>
+      <button class="btn btn-secondary btn-lg" id="btn-invite">
+        &#128279; Invite a Friend
+      </button>
+      <button class="btn btn-ghost btn-lg" id="btn-show-join">
+        &#128273; Join with Code
+      </button>
+    </div>
+    <div id="home-error" class="error-msg"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       JOIN SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-join" class="screen">
+    <div class="card">
+      <h2>Join a Game</h2>
+      <p style="color:var(--text-muted);margin-bottom:1rem;">Enter the 6-character invite code from your opponent.</p>
+      <div class="input-group">
+        <input type="text" id="join-code-input" placeholder="ABC123" maxlength="6" autocomplete="off" autocapitalize="characters" />
+        <button class="btn btn-primary" id="btn-join">Join</button>
+      </div>
+      <div id="join-error" class="error-msg"></div>
+      <button class="btn btn-ghost" id="btn-join-back" style="margin-top:1rem;">&#8592; Back</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       LOBBY / WAITING SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-lobby" class="screen">
+    <div class="spinner"></div>
+    <div class="lobby-text">
+      <h2 id="lobby-title">Finding opponent…</h2>
+      <p id="lobby-subtitle">You'll be matched automatically</p>
+    </div>
+    <div id="invite-code-box" class="invite-code-box" style="display:none;">
+      <p>Share this code with your opponent</p>
+      <div class="invite-code" id="invite-code-display" title="Click to copy"></div>
+      <div class="hint">Click code to copy</div>
+      <div class="copy-confirm" id="copy-confirm"></div>
+    </div>
+    <button class="btn btn-danger" id="btn-cancel-lobby">Cancel</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="game-header">
+      <h2>SimulChess</h2>
+      <button class="btn btn-ghost" id="btn-resign" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Resign</button>
+    </div>
+
+    <div class="timers">
+      <div class="timer-block opponent" id="timer-opponent">
+        <div class="timer-label" id="timer-opponent-label">Opponent</div>
+        <div class="timer-value" id="timer-opponent-value">1:00</div>
+      </div>
+      <div class="timer-block mine" id="timer-mine">
+        <div class="timer-label" id="timer-mine-label">You</div>
+        <div class="timer-value" id="timer-mine-value">1:00</div>
+      </div>
+    </div>
+
+    <div class="board-container">
+      <chess-board
+        id="board"
+        draggable-pieces
+        position="start"
+      ></chess-board>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <span class="dot"></span>
+      <span id="status-text">Waiting…</span>
+    </div>
+
+    <div class="move-panel">
+      <div class="selected-move" id="selected-move-display">No move selected</div>
+      <button class="btn btn-primary" id="btn-confirm" disabled>Confirm</button>
+      <button class="btn btn-ghost" id="btn-clear" disabled>Clear</button>
+    </div>
+
+    <div class="last-result" id="last-result">
+      <div class="events-line">Last turn will appear here after both players move.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GAME OVER SCREEN
+  ══════════════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="result-badge" id="result-badge">&#9876;</div>
+    <div class="result-text">
+      <h2 id="result-heading">Game Over</h2>
+      <p id="result-reason"></p>
+    </div>
+    <div class="gameover-buttons">
+      <button class="btn btn-primary" id="btn-play-again">Play Again</button>
+      <button class="btn btn-ghost" id="btn-home">Home</button>
+    </div>
+  </div>
+
+  <script type="module" src="client.js"></script>
+</body>
+</html>
