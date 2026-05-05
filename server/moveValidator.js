@@ -14,11 +14,13 @@ function squaresOnRay(fromSq, dFile, dRank) {
   return squares;
 }
 
-function pathClear(gameState, fromSq, toSq, dFile, dRank) {
+function pathClear(gameState, fromSq, toSq, dFile, dRank, movingColor) {
   const ray = squaresOnRay(fromSq, dFile, dRank);
   for (const sq of ray) {
     if (sq === toSq) return true;
-    if (gameState.getPiece(sq)) return false; // blocked
+    const p = gameState.getPiece(sq);
+    if (p && colorOf(p) === movingColor) return false; // own piece blocks path
+    // enemy piece in path is allowed speculatively — it may move away this turn
   }
   return false;
 }
@@ -45,9 +47,9 @@ function isValidMove(gameState, from, to, color) {
   switch (type) {
     case 'p': return validatePawn(gameState, from, to, isWhiteColor, fFrom, rFrom, fTo, rTo, df, dr);
     case 'n': return validateKnight(df, dr);
-    case 'b': return validateBishop(gameState, from, to, df, dr);
-    case 'r': return validateRook(gameState, from, to, df, dr);
-    case 'q': return validateQueen(gameState, from, to, df, dr);
+    case 'b': return validateBishop(gameState, from, to, color, df, dr);
+    case 'r': return validateRook(gameState, from, to, color, df, dr);
+    case 'q': return validateQueen(gameState, from, to, color, df, dr);
     case 'k': return validateKing(gameState, from, to, color, df, dr);
     default: return false;
   }
@@ -87,19 +89,19 @@ function validateKnight(df, dr) {
          (Math.abs(df) === 1 && Math.abs(dr) === 2);
 }
 
-function validateBishop(gs, from, to, df, dr) {
+function validateBishop(gs, from, to, color, df, dr) {
   if (Math.abs(df) !== Math.abs(dr) || df === 0) return false;
-  return pathClear(gs, from, to, Math.sign(df), Math.sign(dr));
+  return pathClear(gs, from, to, Math.sign(df), Math.sign(dr), color);
 }
 
-function validateRook(gs, from, to, df, dr) {
+function validateRook(gs, from, to, color, df, dr) {
   if (df !== 0 && dr !== 0) return false;
   if (df === 0 && dr === 0) return false;
-  return pathClear(gs, from, to, Math.sign(df), Math.sign(dr));
+  return pathClear(gs, from, to, Math.sign(df), Math.sign(dr), color);
 }
 
-function validateQueen(gs, from, to, df, dr) {
-  return validateBishop(gs, from, to, df, dr) || validateRook(gs, from, to, df, dr);
+function validateQueen(gs, from, to, color, df, dr) {
+  return validateBishop(gs, from, to, color, df, dr) || validateRook(gs, from, to, color, df, dr);
 }
 
 function validateKing(gs, from, to, color, df, dr) {

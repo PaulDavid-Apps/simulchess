@@ -7,6 +7,21 @@ const { resolveMovePair } = require('./resolver');
 
 const TIMER_MS = 60_000;
 
+// Lifetime metrics (reset on server restart)
+const metrics = {
+  gamesPlayed: 0,
+  whiteWins: 0,
+  blackWins: 0,
+  draws: 0,
+};
+
+function getMetrics() {
+  return {
+    ...metrics,
+    activeGames: [...rooms.values()].filter(r => r.status === 'active').length,
+  };
+}
+
 // In-memory state
 let waitingPlayer = null; // { ws }
 const rooms = new Map();       // roomId → Room
@@ -280,6 +295,11 @@ function endGame(room, outcome, reason) {
 
   if (room.timer) { clearTimeout(room.timer); room.timer = null; }
 
+  metrics.gamesPlayed++;
+  if (outcome === 'white_wins') metrics.whiteWins++;
+  else if (outcome === 'black_wins') metrics.blackWins++;
+  else metrics.draws++;
+
   sendBoth(room, { type: 'GAME_OVER', outcome, reason });
 
   // Clean up after a delay
@@ -323,4 +343,4 @@ function generateCode() {
   return code;
 }
 
-module.exports = { handleConnection };
+module.exports = { handleConnection, getMetrics };
